@@ -1,0 +1,86 @@
+.customShadow{
+  box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+
+/***user table***/
+.userTable{
+  @apply bg-white
+}
+.userTable th{
+  @apply border text-base font-medium
+}
+
+.userTable td{
+  @apply border text-base text-center
+}
+
+/**scrollbar hidden****/
+.scrollbar-none::-webkit-scrollbar{
+  display: none;
+}
+
+/* Enable smooth scrolling */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Wrapper for the scroll container */
+.horizontal-scroll-wrapper {
+  display: flex;
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+  width: 100%;
+  position: relative;
+}
+
+/* Container that holds the product cards, and scrolls infinitely */
+.horizontal-scroll-container {
+  display: flex;
+  width: max-content; /* Ensure the container width is as wide as its content */
+  animation: scroll-left 30s linear infinite; /* Continuous scroll */
+
+}
+
+/* Cards styling */
+.horizontal-card {
+  min-width: 300px;
+  max-width: 350px;
+  margin-right: 1rem;
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+.horizontal-card:hover {
+  transform: scale(1.05);
+
+}
+
+/* Infinite scrolling animation */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0); /* Start from the left */
+  }
+  100% {
+    transform: translateX(-100%); /* Move the entire content to the left */
+  }
+}
+
+.horizontal-scroll-wrapper:hover .horizontal-scroll-container {
+  animation-play-state: paused; 
+}
