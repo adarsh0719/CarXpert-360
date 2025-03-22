@@ -94,7 +94,7 @@ const SummaryApi = {
         method : 'post'
     },
     allOrder:{
-         url : `${backendDomin}/api/all-order`,
+        url : `${backendDomin}/api/all-order`,
         method : 'get'
     }
 

@@ -30,7 +30,7 @@ const orderSchema=new mongoose.Schema({
         default:0
     }
 },{
-    timeStamps:true
+    timestamps:true
 })
 
 const orderModel=mongoose.model('order',orderSchema)

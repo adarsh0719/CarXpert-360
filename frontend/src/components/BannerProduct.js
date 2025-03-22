@@ -4,11 +4,11 @@ import image2 from '../assest/banner/image2.jpg';
 import image3 from '../assest/banner/image3.jpg';
 import image4 from '../assest/banner/image4.jpg';
 import image5 from '../assest/banner/image5.jpg';
-import image1Mobile from '../assest/banner/image1.jpg';
-import image2Mobile from '../assest/banner/image2.jpg';
-import image3Mobile from '../assest/banner/image3.jpg';
-import image4Mobile from '../assest/banner/image4.jpg';
-import image5Mobile from '../assest/banner/image5.jpg';
+import image1Mobile from '../assest/banner/image1a.jpg';
+import image2Mobile from '../assest/banner/image2a.jpg';
+import image3Mobile from '../assest/banner/image3a.jpg';
+import image4Mobile from '../assest/banner/image4a.webp';
+import image5Mobile from '../assest/banner/image5a.jpg';
 import { FaAngleRight, FaAngleLeft } from 'react-icons/fa6';
 import CategoryList from './CategoryList';
 
@@ -59,7 +59,7 @@ const BannerProduct = () => {
           </div>
         </div>
 
-        {/** Desktop and Tablet Version */}
+        {/** Desktop and Tablet Version - Unchanged */}
         <div className="hidden md:flex h-full w-full overflow-hidden">
           {desktopImages.map((imageUrl, index) => (
             <div
@@ -76,22 +76,24 @@ const BannerProduct = () => {
           ))}
         </div>
 
-        {/** Mobile Version */}
-        <div className="flex h-[60vh] md:hidden w-full overflow-hidden">
-          {mobileImages.map((imageUrl, index) => (
-            <div
-              className="w-full h-full min-w-full min-h-full transition-transform duration-500 ease-in-out"
-              key={imageUrl}
-              style={{ transform: `translateX(-${currentImage * 100}%)` }}
-            >
-              <img
-                src={imageUrl}
-                className="w-full h-full object-cover"
-                alt={`Banner ${index + 1}`}
-              />
-            </div>
-          ))}
-        </div>
+        {/** Mobile Version - Modified for full screen */}
+        {/** Mobile Version - Modified for reliable full screen */}
+<div className="flex h-[100dvh] md:hidden w-full overflow-hidden"> {/* Changed to dvh */}
+  {mobileImages.map((imageUrl, index) => (
+    <div
+      className="w-full h-full min-w-full min-h-full transition-transform duration-500 ease-in-out"
+      key={imageUrl}
+      style={{ transform: `translateX(-${currentImage * 100}%)` }}
+    >
+      <img
+        src={imageUrl}
+        className="w-full h-full object-cover"
+        style={{ height: '100dvh' }} // Added as fallback
+        alt={`Banner ${index + 1}`}
+      />
+    </div>
+  ))}
+</div>
       </div>
 
       {/** CategoryList - Centered */}

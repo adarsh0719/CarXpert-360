@@ -6,12 +6,12 @@ const AboutUs = () => {
       <div className="max-w-5xl text-center bg-white p-12 rounded-lg shadow-2xl text-gray-900">
         <h1 className="text-4xl font-extrabold mb-6 text-indigo-700">About Us</h1>
         <p className="text-lg leading-relaxed mb-6">
-          Welcome to <span className="font-semibold text-red-600">CarFix 360</span>, your trusted destination for premium car accessories, AI-driven vehicle diagnostics, and efficient towing services. We blend technology and convenience to ensure seamless vehicle management for car owners.
+          Welcome to <span className="font-semibold text-red-600">CarXpert 360</span>, your trusted destination for premium car accessories, AI-driven vehicle diagnostics, and efficient towing services. We blend technology and convenience to ensure seamless vehicle management for car owners.
         </p>
 
         <h2 className="text-3xl font-semibold text-gray-800 mt-8">Our Mission</h2>
         <p className="text-lg text-gray-700 mt-2">
-          At <span className="font-bold text-indigo-600">CarFix 360</span>, we aim to redefine the automotive service industry by integrating cutting-edge AI solutions, making car maintenance effortless, accurate, and reliable.
+          At <span className="font-bold text-indigo-600">CarXpert 360</span>, we aim to redefine the automotive service industry by integrating cutting-edge AI solutions, making car maintenance effortless, accurate, and reliable.
         </p>
 
         <h2 className="text-3xl font-semibold text-gray-800 mt-8">What We Offer</h2>

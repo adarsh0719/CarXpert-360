@@ -2,7 +2,7 @@ const orderModel=require("../../models/orderProductModel")
 const userModel=require("../../models/userModel")
 
 
-const allOrderController=async(requestAnimationFrame,response)=>{
+const allOrderController=async(request,response)=>{
            const userId=request.userId
            const user=await userModel.findById(userId)
 
@@ -12,7 +12,7 @@ const allOrderController=async(requestAnimationFrame,response)=>{
             })
            }
 
-           const AllOrder=await orderModel.find().sort({createdAt:-1})
+           const AllOrder = await orderModel.find().sort({ createdAt: 1 });
 
 
         return response.status(200).json({

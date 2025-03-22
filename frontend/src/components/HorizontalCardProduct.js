@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import fetchCategoryWiseProduct from '../helpers/fetchCategoryWiseProduct';
 import displayINRCurrency from '../helpers/displayCurrency';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa6';
@@ -10,8 +10,13 @@ const HorizontalCardProduct = ({ category, heading }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const loadingList = new Array(13).fill(null);
-
   const { fetchUserAddToCart } = useContext(Context);
+  const scrollContainerRef = useRef(null);
+  
+  // Touch handling refs
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isHorizontalScroll = useRef(false);
 
   const handleAddToCart = async (e, id) => {
     await addToCart(e, id);
@@ -25,15 +30,54 @@ const HorizontalCardProduct = ({ category, heading }) => {
     setData(categoryProduct?.data);
   };
 
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isHorizontalScroll.current = false;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isHorizontalScroll.current) {
+      const deltaX = Math.abs(e.touches[0].clientX - touchStartX.current);
+      const deltaY = Math.abs(e.touches[0].clientY - touchStartY.current);
+      
+      // Determine scroll direction
+      if (deltaX > deltaY * 2) {
+        // Horizontal scroll detected
+        isHorizontalScroll.current = true;
+        e.preventDefault();
+      }
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    
+    // Add touch event listeners
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('touchstart', handleTouchStart, { passive: false });
+      container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('touchstart', handleTouchStart);
+        container.removeEventListener('touchmove', handleTouchMove);
+      }
+    };
   }, []);
 
   return (
     <div className="container mx-auto px-4 my-6 relative">
       <h2 className="text-2xl font-semibold py-4">{heading}</h2>
 
-      <div className="horizontal-scroll-wrapper">
+      <div 
+        className="horizontal-scroll-wrapper"
+        ref={scrollContainerRef}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+      >
         <div className="horizontal-scroll-container">
           {loading ? (
             loadingList.map((_, index) => (

@@ -6,8 +6,8 @@ import displayINRCurrency from '../helpers/displayCurrency'
 const AllOrder = () => {
     const[data,setData]=useState([])
     const fetchOrderDetails=async()=>{
-      const response=await fetch(SummaryApi.getOrder.url,{
-        method:SummaryApi.getOrder.method,
+      const response=await fetch(SummaryApi.allOrder.url,{
+        method:SummaryApi.allOrder.method,
         credentials:'include'
       })
       const responseData=await response.json()

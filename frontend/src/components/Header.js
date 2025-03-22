@@ -81,9 +81,8 @@ const Header = () => {
   const menuItems = [
     { path: "damagedetector", name: "Damage Analyser" },
     { path: "towingservice", name: "Towing Service" },
-    { path: "admin-panel/all-orders", name: "MyOrders" },
-    { path: "admin-panel/all-users", name: "AllUsers" },
-    { path: "admin-panel/all-products", name: "AllProducts" },
+    { path: "order", name: "MyOrders" },
+    { path: "admin-panel/all-users", name: "Admin-Panel" },
     { path: "about", name: "About Us" },
   ];
 
