@@ -104,12 +104,12 @@ const VerticalCardProduct = ({ category, heading }) => {
                 <Link 
                   key={product._id} 
                   to={`product/${product._id}`}
-                  className="w-full min-w-[280px] sm:min-w-[280px] md:min-w-[320px] max-w-[280px] sm:max-w-[280px] md:max-w-[320px] bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border border-gray-100 relative overflow-hidden group"
+                  className="w-full min-w-[280px] sm:min-w-[280px] md:min-w-[320px] max-w-[280px] sm:max-w-[280px] md:max-w-[320px] bg-white rounded-xl shadow-md md:hover:shadow-xl transition-shadow border border-gray-100 relative overflow-hidden group"
                 >
                   <div className="bg-gray-200 h-40 sm:h-48 flex justify-center items-center overflow-hidden p-0 rounded-t-xl relative">
                     <img 
                       src={product.productImage[0]} 
-                      className="object-cover w-full h-full group-hover:scale-110 transition-all duration-300" 
+                      className="object-cover w-full h-full md:group-hover:scale-110 transition-all duration-300" 
                       alt={product.productName} 
                     />
                   </div>
@@ -129,7 +129,7 @@ const VerticalCardProduct = ({ category, heading }) => {
                       </p>
                     </div>
                     <button 
-                      className="text-xs sm:text-sm bg-black hover:bg-gray-800 text-white px-3 py-1 sm:px-4 sm:py-2 font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
+                      className="text-xs sm:text-sm bg-black hover:bg-gray-800 text-white px-3 py-1 sm:px-4 sm:py-2 font-semibold rounded-full transition-all duration-300 transform md:hover:scale-105"
                       onClick={(e) => handleAddToCart(e, product._id)}
                     >
                       Add to Cart
