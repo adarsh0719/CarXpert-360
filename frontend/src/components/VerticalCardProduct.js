@@ -13,10 +13,11 @@ const VerticalCardProduct = ({ category, heading }) => {
   const scrollElement = useRef();
   const { fetchUserAddToCart } = useContext(Context);
 
-  // Touch handling refs
+  // Mobile touch handling refs
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
-  const isScrolling = useRef(false);
+  const isHorizontal = useRef(false);
+  const initialScrollLeft = useRef(0);
 
   const handleAddToCart = async (e, id) => {
     await addToCart(e, id);
@@ -34,7 +35,34 @@ const VerticalCardProduct = ({ category, heading }) => {
     fetchData();
   }, []);
 
+  // Mobile touch handlers
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    initialScrollLeft.current = scrollElement.current.scrollLeft;
+    isHorizontal.current = false;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!scrollElement.current) return;
+    
+    const deltaX = e.touches[0].clientX - touchStartX.current;
+    const deltaY = e.touches[0].clientY - touchStartY.current;
+
+    if (!isHorizontal.current) {
+      // Determine scroll direction
+      isHorizontal.current = Math.abs(deltaX) > Math.abs(deltaY);
+    }
+
+    if (isHorizontal.current) {
+      // Horizontal scroll - handle card scrolling
+      e.preventDefault();
+      scrollElement.current.scrollLeft = initialScrollLeft.current - deltaX;
+    }
+  };
+
   const smoothScroll = (direction) => {
+    // Existing desktop smooth scroll implementation
     if (scrollElement.current) {
       const container = scrollElement.current;
       const card = container.firstChild;
@@ -66,26 +94,6 @@ const VerticalCardProduct = ({ category, heading }) => {
     }
   };
 
-  // Touch event handlers
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-    isScrolling.current = false;
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isScrolling.current) {
-      const xDiff = Math.abs(e.touches[0].clientX - touchStartX.current);
-      const yDiff = Math.abs(e.touches[0].clientY - touchStartY.current);
-      
-      if (xDiff > yDiff) {
-        // Horizontal scroll detected
-        isScrolling.current = true;
-        e.preventDefault();
-      }
-    }
-  };
-
   return (
     <div className="container mx-auto px-3 sm:px-4 my-4 sm:my-6 relative">
       <h2 className="text-xl sm:text-2xl font-semibold py-3 sm:py-4 text-gray-800">{heading}</h2>
@@ -106,7 +114,7 @@ const VerticalCardProduct = ({ category, heading }) => {
           <FaAngleRight className="text-gray-700" />
         </button>
 
-        {/* Scroll container with touch handlers */}
+        {/* Scroll container with mobile touch handling */}
         <div 
           className="flex items-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto scrollbar-none transition-all touch-pan-x"
           ref={scrollElement}
