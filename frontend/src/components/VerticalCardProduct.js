@@ -13,6 +13,11 @@ const VerticalCardProduct = ({ category, heading }) => {
   const scrollElement = useRef();
   const { fetchUserAddToCart } = useContext(Context);
 
+  // Touch handling refs
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isScrolling = useRef(false);
+
   const handleAddToCart = async (e, id) => {
     await addToCart(e, id);
     fetchUserAddToCart();
@@ -41,7 +46,7 @@ const VerticalCardProduct = ({ category, heading }) => {
       const targetScroll = direction === 'right' ? container.scrollLeft + scrollAmount : container.scrollLeft - scrollAmount;
       
       let startTime;
-      const duration = 1000; 
+      const duration = 1000;
       const startScroll = container.scrollLeft;
 
       const animateScroll = (timestamp) => {
@@ -61,12 +66,32 @@ const VerticalCardProduct = ({ category, heading }) => {
     }
   };
 
+  // Touch event handlers
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isScrolling.current = false;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isScrolling.current) {
+      const xDiff = Math.abs(e.touches[0].clientX - touchStartX.current);
+      const yDiff = Math.abs(e.touches[0].clientY - touchStartY.current);
+      
+      if (xDiff > yDiff) {
+        // Horizontal scroll detected
+        isScrolling.current = true;
+        e.preventDefault();
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto px-3 sm:px-4 my-4 sm:my-6 relative">
       <h2 className="text-xl sm:text-2xl font-semibold py-3 sm:py-4 text-gray-800">{heading}</h2>
 
       <div className="relative">
-        {/* Scroll buttons (hidden on mobile) */}
+        {/* Desktop scroll buttons */}
         <button
           className="bg-white shadow-lg rounded-full p-3 absolute left-0 top-1/2 transform -translate-y-1/2 text-lg hidden md:block hover:bg-gray-100 transition-all duration-300 transform hover:scale-110 z-10"
           onClick={() => smoothScroll('left')}
@@ -81,9 +106,12 @@ const VerticalCardProduct = ({ category, heading }) => {
           <FaAngleRight className="text-gray-700" />
         </button>
 
+        {/* Scroll container with touch handlers */}
         <div 
           className="flex items-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto scrollbar-none transition-all touch-pan-x"
           ref={scrollElement}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
         >
           {loading
             ? loadingList.map((_, index) => (
