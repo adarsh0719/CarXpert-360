@@ -12,11 +12,9 @@ const VerticalCardProduct = ({ category, heading }) => {
   const loadingList = new Array(13).fill(null);
   const scrollElement = useRef();
   const { fetchUserAddToCart } = useContext(Context);
-
-  // Mobile touch handling refs
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
-  const initialScrollLeft = useRef(0);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
 
   const handleAddToCart = async (e, id) => {
     await addToCart(e, id);
@@ -34,26 +32,39 @@ const VerticalCardProduct = ({ category, heading }) => {
     fetchData();
   }, []);
 
-  // Mobile touch handlers
+  // Mobile touch handlers with momentum scrolling
   const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-    initialScrollLeft.current = scrollElement.current.scrollLeft;
+    isDragging.current = true;
+    startX.current = e.touches[0].pageX;
+    scrollLeft.current = scrollElement.current.scrollLeft;
   };
 
   const handleTouchMove = (e) => {
-    if (!scrollElement.current) return;
-    
-    const deltaX = e.touches[0].clientX - touchStartX.current;
-    const deltaY = e.touches[0].clientY - touchStartY.current;
-
-    // Only prevent default for horizontal swipes
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      e.preventDefault();
-      scrollElement.current.scrollLeft = initialScrollLeft.current - deltaX;
-    }
+    if (!isDragging.current) return;
+    e.preventDefault();
+    const x = e.touches[0].pageX;
+    const walk = (x - startX.current) * 2; // Adjust multiplier for sensitivity
+    scrollElement.current.scrollLeft = scrollLeft.current - walk;
   };
 
+  const handleTouchEnd = () => {
+    isDragging.current = false;
+    // Add smooth momentum scroll
+    const container = scrollElement.current;
+    const start = container.scrollLeft;
+    const momentum = (container.scrollLeft - start) * 0.2;
+    
+    const animate = () => {
+      if (!isDragging.current && Math.abs(momentum) > 0.5) {
+        container.scrollLeft += momentum;
+        momentum *= 0.95; // Decay factor
+        requestAnimationFrame(animate);
+      }
+    };
+    requestAnimationFrame(animate);
+  };
+
+  // Desktop smooth scroll (unchanged)
   const smoothScroll = (direction) => {
     if (scrollElement.current) {
       const container = scrollElement.current;
@@ -81,7 +92,6 @@ const VerticalCardProduct = ({ category, heading }) => {
           requestAnimationFrame(animateScroll);
         }
       };
-
       requestAnimationFrame(animateScroll);
     }
   };
@@ -91,7 +101,7 @@ const VerticalCardProduct = ({ category, heading }) => {
       <h2 className="text-xl sm:text-2xl font-semibold py-3 sm:py-4 text-gray-800">{heading}</h2>
 
       <div className="relative">
-        {/* Desktop scroll buttons */}
+        {/* Desktop scroll buttons (unchanged) */}
         <button
           className="bg-white shadow-lg rounded-full p-3 absolute left-0 top-1/2 transform -translate-y-1/2 text-lg hidden md:block hover:bg-gray-100 transition-all duration-300 transform hover:scale-110 z-10"
           onClick={() => smoothScroll('left')}
@@ -106,18 +116,27 @@ const VerticalCardProduct = ({ category, heading }) => {
           <FaAngleRight className="text-gray-700" />
         </button>
 
-        {/* Scroll container with updated touch handling */}
+        {/* Enhanced scroll container */}
         <div 
-          className="flex items-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto scrollbar-none transition-all touch-pan-y"
+          className="flex items-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto scrollbar-none 
+            transition-[scroll-behavior] duration-300 touch-pan-y md:touch-auto
+            scroll-snap-x mandatory md:scroll-snap-none"
           ref={scrollElement}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
+          style={{ 
+            scrollBehavior: 'smooth',
+            WebkitOverflowScrolling: 'touch' 
+          }}
         >
           {loading
             ? loadingList.map((_, index) => (
                 <div 
                   key={index} 
-                  className="w-full min-w-[280px] sm:min-w-[280px] md:min-w-[320px] max-w-[280px] sm:max-w-[280px] md:max-w-[320px] bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border border-gray-100"
+                  className="w-full min-w-[280px] sm:min-w-[280px] md:min-w-[320px] max-w-[280px] sm:max-w-[280px] md:max-w-[320px] 
+                    bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow border border-gray-100 scroll-snap-align-start"
                 >
                   <div className="bg-gray-200 h-40 sm:h-48 p-4 animate-pulse rounded-t-xl" />
                   <div className="p-3 sm:p-4 grid gap-2 sm:gap-3">
@@ -132,7 +151,9 @@ const VerticalCardProduct = ({ category, heading }) => {
                 <Link 
                   key={product._id} 
                   to={`product/${product._id}`}
-                  className="w-full min-w-[280px] sm:min-w-[280px] md:min-w-[320px] max-w-[280px] sm:max-w-[280px] md:max-w-[320px] bg-white rounded-xl shadow-md md:hover:shadow-xl transition-shadow border border-gray-100 relative overflow-hidden group"
+                  className="w-full min-w-[280px] sm:min-w-[280px] md:min-w-[320px] max-w-[280px] sm:max-w-[280px] md:max-w-[320px] 
+                    bg-white rounded-xl shadow-md md:hover:shadow-xl transition-shadow border border-gray-100 relative overflow-hidden group
+                    scroll-snap-align-start"
                 >
                   <div className="bg-gray-200 h-40 sm:h-48 flex justify-center items-center overflow-hidden p-0 rounded-t-xl relative">
                     <img 
