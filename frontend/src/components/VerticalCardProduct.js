@@ -16,7 +16,6 @@ const VerticalCardProduct = ({ category, heading }) => {
   // Mobile touch handling refs
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
-  const isHorizontal = useRef(false);
   const initialScrollLeft = useRef(0);
 
   const handleAddToCart = async (e, id) => {
@@ -40,7 +39,6 @@ const VerticalCardProduct = ({ category, heading }) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
     initialScrollLeft.current = scrollElement.current.scrollLeft;
-    isHorizontal.current = false;
   };
 
   const handleTouchMove = (e) => {
@@ -49,20 +47,14 @@ const VerticalCardProduct = ({ category, heading }) => {
     const deltaX = e.touches[0].clientX - touchStartX.current;
     const deltaY = e.touches[0].clientY - touchStartY.current;
 
-    if (!isHorizontal.current) {
-      // Determine scroll direction
-      isHorizontal.current = Math.abs(deltaX) > Math.abs(deltaY);
-    }
-
-    if (isHorizontal.current) {
-      // Horizontal scroll - handle card scrolling
+    // Only prevent default for horizontal swipes
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
       e.preventDefault();
       scrollElement.current.scrollLeft = initialScrollLeft.current - deltaX;
     }
   };
 
   const smoothScroll = (direction) => {
-    // Existing desktop smooth scroll implementation
     if (scrollElement.current) {
       const container = scrollElement.current;
       const card = container.firstChild;
@@ -114,9 +106,9 @@ const VerticalCardProduct = ({ category, heading }) => {
           <FaAngleRight className="text-gray-700" />
         </button>
 
-        {/* Scroll container with mobile touch handling */}
+        {/* Scroll container with updated touch handling */}
         <div 
-          className="flex items-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto scrollbar-none transition-all touch-pan-x"
+          className="flex items-center gap-3 sm:gap-4 md:gap-6 overflow-x-auto scrollbar-none transition-all touch-pan-y"
           ref={scrollElement}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
