@@ -79,8 +79,8 @@ const Header = () => {
   }, [lastScrollY]);
 
   const menuItems = [
-    { path: "damagedetector", name: "Damage Analyser" },
-    { path: "towingservice", name: "Towing Service" },
+    { path: "damagedetector", name: "Damage Analyser[new]" },
+    { path: "towingservice", name: "Towing Service[new]" },
     { path: "order", name: "MyOrders" },
     { path: "admin-panel/all-users", name: "Admin-Panel" },
     { path: "about", name: "About Us" },
@@ -328,7 +328,7 @@ const Header = () => {
               ✕ CLOSE
             </button>
 
-            {/* Menu Items - Original styling */}
+            {/* Menu Items with Mobile Size Adjustment */}
             <div className="flex flex-col space-y-8">
               {menuItems.map((item, index) => (
                 <motion.div
@@ -341,7 +341,7 @@ const Header = () => {
                 >
                   <Link
                     to={`/${item.path}`}
-                    className="uppercase tracking-wider text-lg font-light hover:text-gray-300 transition-colors duration-300"
+                    className="uppercase tracking-wider text-sm md:text-lg font-light hover:text-gray-300 transition-colors duration-300"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.name}

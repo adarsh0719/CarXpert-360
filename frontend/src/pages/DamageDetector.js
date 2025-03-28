@@ -79,6 +79,7 @@ const DamageDetector = () => {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
     const loadModel = async () => {
@@ -90,6 +91,12 @@ const DamageDetector = () => {
       }
     };
     loadModel();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleDragOver = (e) => {
@@ -132,22 +139,39 @@ const DamageDetector = () => {
   };
 
   const handleImageLoad = () => {
-    setImageDimensions({
-      width: imageRef.current.naturalWidth,
-      height: imageRef.current.naturalHeight
-    });
-    canvasRef.current.width = imageRef.current.naturalWidth;
-    canvasRef.current.height = imageRef.current.naturalHeight;
+    const img = imageRef.current;
+    const naturalWidth = img.naturalWidth;
+    const naturalHeight = img.naturalHeight;
+
+    let targetWidth = naturalWidth;
+    let targetHeight = naturalHeight;
+
+    if (isMobile && naturalWidth > 800) {
+      targetWidth = 800;
+      targetHeight = (naturalHeight * 800) / naturalWidth;
+    }
+
+    const canvas = canvasRef.current;
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+    setImageDimensions({ width: targetWidth, height: targetHeight });
   };
 
   const classifyDamage = (component) => {
     const damageTypes = [];
     const componentArea = component.bbox[2] * component.bbox[3];
-    
-    if (component.score > 0.7) damageTypes.push('dent');
-    if (componentArea > 5000) damageTypes.push('crack');
-    if (component.bbox[2] < 100 && component.score > 0.5) damageTypes.push('scratch');
-    
+    const totalArea = imageDimensions.width * imageDimensions.height;
+    const widthThreshold = imageDimensions.width * 0.05;
+
+    if (component.score > (isMobile ? 0.65 : 0.7)) damageTypes.push('dent');
+    if (componentArea > totalArea * 0.03) damageTypes.push('crack');
+    if (component.bbox[2] < widthThreshold && component.score > (isMobile ? 0.45 : 0.5)) {
+      damageTypes.push('scratch');
+    }
+
     return damageTypes;
   };
 
@@ -177,15 +201,16 @@ const DamageDetector = () => {
     setResults(prev => ({ ...prev, damageOverlays: [] }));
 
     try {
-      const predictions = await model.detect(imageRef.current);
+      const predictions = await model.detect(canvasRef.current);
+      const scoreThreshold = isMobile ? 0.5 : 0.6;
+      const severityThreshold = isMobile ? 0.35 : 0.4;
       const vehicleComponents = predictions.filter(p => 
-        Object.keys(COMPONENT_COSTS).includes(p.class.toLowerCase())
+        Object.keys(COMPONENT_COSTS).includes(p.class.toLowerCase()) && p.score >= scoreThreshold
       );
 
       const damageTypesMap = new Map();
       const suggestedParts = [];
       const partsCache = new Set();
-
       let totalCost = 0;
       let totalArea = 0;
       const detectedComponents = new Set();
@@ -198,7 +223,7 @@ const DamageDetector = () => {
         const areaRatio = componentArea / (imageDimensions.width * imageDimensions.height);
         const severity = component.score * 0.7 + (areaRatio * 0.3);
 
-        if (severity >= 0.4 && component.score >= 0.6) {
+        if (severity >= severityThreshold) {
           totalCost += costData.base + (costData.multiplier * severity * 100);
           totalArea += componentArea;
           detectedComponents.add(componentType);
